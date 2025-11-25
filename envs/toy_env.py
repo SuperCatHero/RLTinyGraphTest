@@ -48,6 +48,8 @@ class ToyUTGEnv(gym.Env):
         
         # [修改 3] Terminated (任务完成) vs Truncated (超时/达到深度限制)
         terminated = len(self.explored_edges) >= total_edges
+        if terminated:
+            reward += 100
         truncated = self.current_episode_step >= self.max_depth
         
         # Gym 规范：done = terminated or truncated

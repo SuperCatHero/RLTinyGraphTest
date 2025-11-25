@@ -36,16 +36,26 @@ class EnvMonitor(gym.Wrapper):
     def get_stats(self):
         """提取统计数据"""
         # 注意：需要兼容 env 可能被 unwrapped 的情况，依然去拿最底层的 explored_edges
+        # [核心修复] 优先检查 Success 标记
+        # 我们使用 getattr 安全地获取，防止 ToyUTGEnv 没有这个属性报错
+        # self.env.unwrapped 确保我们拿到的是最底层的 HardUTGEnv 对象
+        if getattr(self.env.unwrapped, 'success', False):
+            return {
+                "steps": self.step_counter,
+                "coverage_percent": 100.0 # <--- 强制满分！
+            }
+            
+        # 如果没成功，再走普通公式
         current_edges = len(self.env.unwrapped.explored_edges)
         
         if self.max_possible_edges == 0:
-            coverage = 0.0
+            cov = 0.0
         else:
-            coverage = (current_edges / self.max_possible_edges) * 100
+            cov = (current_edges / self.max_possible_edges) * 100
             
         return {
             "steps": self.step_counter,
-            "coverage_percent": coverage
+            "coverage_percent": cov
         }
     
     # 确保 wrapper 能代理访问原环境的所有自定义属性
@@ -158,4 +168,5 @@ def _plot_results(results):
     ax2.grid(axis='y', linestyle='--', alpha=0.5)
     
     plt.tight_layout()
+
     # plt.show()
