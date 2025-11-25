@@ -1,5 +1,11 @@
-__pycache__/
-results_video/
+# Ignore Python bytecode
 *.pyc
-*.DS_Store
+__pycache__/
+
+# Ignore macOS system files
+.DS_Store
+**/.DS_Store
+
+# Ignore large files
+results_video
 

@@ -29,8 +29,7 @@ class HardUTGEnv(gym.Env):
         prev_state = self.state
         
         # 状态转移
-        if prev_state == 0: 
-            next_state = 1
+        if prev_state == 0: next_state = 1
         elif prev_state == 999: next_state = 999
         else:
             if action == 0: next_state = prev_state + 1
