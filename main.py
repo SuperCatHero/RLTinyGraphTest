@@ -32,9 +32,8 @@ def main():
             # 单次允许走 20 层（足够深，让 DFS 迷路）
             max_depth=20,     
             
-            # 总预算只有 15 步
             # DFS 至少需要 20+ 步才能回溯，所以 15 步它会死在半路上
-            total_budget=15, 
+            total_budget=100, 
             
             runs=1
         )
