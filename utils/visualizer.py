@@ -154,7 +154,7 @@ class GraphAnimator:
         self.frame_count += 1
 
     def create_gif(self, folder_name, filename_prefix="exploration", fps=2):
-        save_dir = os.path.join("results_video",folder_name)
+        save_dir = folder_name
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
         

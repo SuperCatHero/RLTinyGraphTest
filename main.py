@@ -1,58 +1,42 @@
 import os
 import sys
+import torch
 from datetime import datetime
-from envs.toy_env import ToyUTGEnv
-from envs.hard_env import HardUTGEnv
-from envs.complex_env import ComplexDateEnv
 from utils.evaluator import evaluate_algorithms
 from utils.config import ARGConfig
 from utils.default_config import default_config
-from algos.dfs import run_dfs_session
-from algos.q_learning import run_q_learning_session
+from algos import dfs,q_learning
+from envs.factory import get_env_class
 
 def main():
-    competitors = {
-        # "DFS": run_dfs_session,
-        "Q-Learning": run_q_learning_session
-    }
-    
-    # evaluate_algorithms(
-    #     env_class=ToyUTGEnv, 
-    #     competitors=competitors, 
-    #     folder_name = datetime.now().strftime("%Y%m%d_%H%M%S"),
-    #     # 1. 限制单个 Episode 深度 (例如：用户不会点太深) -> 传给 Env
-    #     max_depth=30,     
-    #     # 2. 限制总点击次数 (例如：测试总时长限制) -> 传给 Algorithm Runner
-    #     total_budget=50, 
-    #     runs=1
-    # )
-    # evaluate_algorithms(
-    #         env_class=HardUTGEnv,  # <--- 切换为 Hard 环境
-    #         competitors=competitors, 
-    #         folder_name = "Hard_"+datetime.now().strftime("%Y%m%d_%H%M%S"),
-    #         # 单次允许走 20 层
-    #         max_depth=20,     
-            
-    #         # DFS 至少需要 20+ 步才能回溯，所以 15 步它会死在半路上
-    #         total_budget=100, 
-            
-    #         runs=1
-    #     )
+    arg = ARGConfig()
+    arg.add_arg("env_name", "toy", "Environment name")
+    arg.add_arg("num_steps", 100, "Maximum Number of Steps")
+    arg.add_arg("truncated", 10, "Truncated Length")
+    arg.add_arg("runs", 1, "Evaluation Times")
+    arg.parser()
 
+    config = default_config  
+    config.update(arg)
+
+    result_path = os.path.join("results", "{}_t{}_n{}_{}".format(config.env_name, 
+                                                            config.truncated, config.num_steps, 
+                                                            datetime.now().strftime("%Y-%m-%d_%H-%M-%S")))
+    os.system("mkdir -p %s"%result_path)
+
+    competitors = {
+        "DFS": dfs.run_dfs_session,
+        "Q-Learning": q_learning.run_q_learning_session
+    }
+
+    EnvClass = get_env_class(config.env_name)
     evaluate_algorithms(
-            env_class=ComplexDateEnv, 
+            env_class=EnvClass, 
             competitors=competitors, 
-            folder_name = "Complex_"+datetime.now().strftime("%Y%m%d_%H%M%S"),
-            # Max Depth = 20
-            # DFS 很容易迷失在 Month 0 的 31 个日期按钮里
-            # 或者迷失在 Next Month 的无限翻页里
-            max_depth=100,     
-            
-            # Total Budget = 50
-            # 对于有 33 个分支的树，50步连第一层都遍历不完
-            total_budget=1000, 
-            
-            runs=1 # 跑少一点，因为 DFS 可能会很慢
+            folder_name = result_path,
+            max_depth=config.truncated,     
+            total_budget=config.num_steps, 
+            runs=config.runs
         )
 
 if __name__ == "__main__":

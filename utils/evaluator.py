@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import gymnasium as gym
 from utils.visualizer import GraphAnimator
+import os
+import sys
 
 class EnvMonitor(gym.Wrapper):
     def __init__(self, env):
@@ -114,9 +116,9 @@ def evaluate_algorithms(env_class, competitors, folder_name, max_depth=10, total
     print("="*75)
     
     # --- 绘制图表 (增加第3张图) ---
-    _plot_results(final_results)
+    _plot_results(folder_name, final_results)
 
-def _plot_results(results):
+def _plot_results(folder_name, results):
     names = list(results.keys())
     avg_steps = [results[n]['avg_steps'] for n in names]
     avg_cov = [results[n]['avg_cov'] for n in names]
@@ -150,5 +152,4 @@ def _plot_results(results):
                 f'{height:.0f}%',
                 ha='center', va='bottom')
     
-    plt.tight_layout()
-    # plt.show()
+    plt.savefig(os.path.join(folder_name, "eval.png"), dpi=100)
