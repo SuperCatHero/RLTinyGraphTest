@@ -10,7 +10,7 @@ from envs.factory import get_env_class
 
 def main():
     arg = ARGConfig()
-    arg.add_arg("env_name", "toy", "Environment name")
+    arg.add_arg("env_name", "multistart", "Environment name")
     arg.add_arg("num_steps", 100, "Maximum Number of Steps")
     arg.add_arg("truncated", 10, "Truncated Length")
     arg.add_arg("runs", 1, "Evaluation Times")
